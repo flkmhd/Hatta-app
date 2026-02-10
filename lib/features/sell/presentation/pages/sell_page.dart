@@ -150,10 +150,12 @@ class _SellPageState extends State<SellPage> {
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: AppColors.secondary,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.secondaryDark
+                      : AppColors.secondary,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: AppColors.border,
+                    color: Theme.of(context).dividerColor,
                     width: 2,
                     style: BorderStyle.solid,
                   ),
@@ -280,11 +282,13 @@ class _SellPageState extends State<SellPage> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary.withOpacity(0.1)
-              : AppColors.card,
+              ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+              : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
+            color: isSelected
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).dividerColor,
             width: isSelected ? 2 : 1,
           ),
         ),

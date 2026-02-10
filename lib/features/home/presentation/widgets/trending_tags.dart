@@ -86,7 +86,7 @@ class TrendingTags extends StatelessWidget {
                         Icon(
                           tag.icon,
                           size: 14,
-                          color: AppColors.accentForeground,
+                          color: const Color.fromARGB(255, 255, 255, 255),
                         ),
                         const SizedBox(width: 6),
                       ],
@@ -95,7 +95,7 @@ class TrendingTags extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.accentForeground,
+                          color: const Color.fromARGB(255, 255, 255, 255),
                         ),
                       ),
                     ],

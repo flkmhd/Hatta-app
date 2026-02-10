@@ -1,17 +1,39 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../features/home/presentation/pages/main_shell.dart';
+import '../../features/auth/presentation/pages/auth_page.dart';
 
 /// App Router configuration using go_router
-class AppRouter {
-  AppRouter._();
-
-  static final GoRouter router = GoRouter(
+final goRouterProvider = Provider<GoRouter>((ref) {
+  return GoRouter(
     initialLocation: '/',
     debugLogDiagnostics: true,
+    refreshListenable: GoRouterRefreshStream(
+      Supabase.instance.client.auth.onAuthStateChange,
+    ),
+    redirect: (context, state) {
+      final session = Supabase.instance.client.auth.currentSession;
+      final isAuth = session != null;
+      final isAuthPage = state.uri.toString() == '/auth';
+
+      if (!isAuth && !isAuthPage) {
+        return '/auth';
+      }
+
+      if (isAuth && isAuthPage) {
+        return '/';
+      }
+
+      return null;
+    },
     routes: [
       // Main app shell with bottom navigation
       GoRoute(path: '/', builder: (context, state) => const MainShell()),
+      // Auth Page
+      GoRoute(path: '/auth', builder: (context, state) => const AuthPage()),
     ],
     errorBuilder: (context, state) => Scaffold(
       body: Center(
@@ -23,6 +45,7 @@ class AppRouter {
             Text(
               'Page not found',
               style: Theme.of(context).textTheme.headlineSmall,
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
@@ -41,4 +64,22 @@ class AppRouter {
       ),
     ),
   );
+});
+
+/// Converts a [Stream] into a [Listenable]
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    notifyListeners();
+    _subscription = stream.asBroadcastStream().listen(
+      (dynamic _) => notifyListeners(),
+    );
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
 }

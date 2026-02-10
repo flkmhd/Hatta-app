@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/theme_provider.dart';
 import '../../core/l10n/app_localizations.dart';
+import '../../features/auth/presentation/controllers/auth_controller.dart';
 
 /// Header component matching React's Header.tsx exactly
 class AppHeader extends ConsumerWidget {
@@ -199,6 +200,32 @@ class AppHeader extends ConsumerWidget {
                   ),
                 ),
               ),
+
+              const SizedBox(width: 8),
+
+              // Logout Button (visible only when authenticated)
+              if (ref.watch(authStateProvider).value?.session != null)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: GestureDetector(
+                    onTap: () {
+                      ref.read(authControllerProvider.notifier).signOut();
+                    },
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: AppColors.destructive.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.logout,
+                        size: 18,
+                        color: AppColors.destructive,
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ],

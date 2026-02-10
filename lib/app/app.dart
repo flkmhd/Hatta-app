@@ -13,6 +13,7 @@ class HattaApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeProvider);
+    final router = ref.watch(goRouterProvider);
 
     return MaterialApp.router(
       title: 'Hatta',
@@ -24,7 +25,7 @@ class HattaApp extends ConsumerWidget {
       themeMode: themeMode,
 
       // Routing
-      routerConfig: AppRouter.router,
+      routerConfig: router,
 
       // Localization
       localizationsDelegates: const [
