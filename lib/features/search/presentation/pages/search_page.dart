@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../shared/widgets/product_card.dart';
+import '../../../home/data/products_service.dart';
 import '../../../home/domain/models/product.dart';
 
 /// Category data class
@@ -26,6 +27,7 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  final ProductsService _productsService = ProductsService();
   final TextEditingController _searchController = TextEditingController();
   String _selectedCategory = 'all';
   bool _showFilters = false;
@@ -67,15 +69,24 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Future<void> _loadProducts() async {
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    // Same mock data as HomeFeed for now
-    setState(() {
-      _products = _getMockProducts();
-      _isLoading = false;
-    });
+    try {
+      final products = await _productsService.fetchLatestProducts();
+      if (!mounted) return;
+      setState(() {
+        _products = products;
+        _isLoading = false;
+      });
+    } catch (error) {
+      debugPrint('Failed to load search products: $error');
+      if (!mounted) return;
+      setState(() {
+        _products = [];
+        _isLoading = false;
+      });
+    }
   }
 
+  // ignore: unused_element
   List<Product> _getMockProducts() {
     return [
       Product(
@@ -404,7 +415,7 @@ class _SearchPageState extends State<SearchPage> {
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
                       itemCount: _categories.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 8),
+                      separatorBuilder: (_, _) => const SizedBox(width: 8),
                       itemBuilder: (context, index) {
                         final category = _categories[index];
                         final isActive = _selectedCategory == category.id;

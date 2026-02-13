@@ -101,24 +101,25 @@ class Product extends Equatable {
   factory Product.fromSupabase(Map<String, dynamic> json) {
     final imageUrls = (json['image_urls'] as List<dynamic>?) ?? [];
     final sellerData = json['seller'] as Map<String, dynamic>?;
+    final fallbackWilaya = _getWilayaName(sellerData?['wilaya_id'] as int?);
 
     return Product(
-      id: json['id'] as String,
+      id: json['id'].toString(),
       image: imageUrls.isNotEmpty
           ? imageUrls[0] as String
           : 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&q=80',
       title: json['title'] as String,
       description: json['description'] as String? ?? '',
       price: (json['price'] as num).toDouble(),
-      size: 'Unique', // DB doesn't have size yet
+      size: json['size'] as String? ?? 'Unique',
       condition: ProductConditionExtension.fromString(
         json['condition'] as String? ?? 'Bon',
       ),
       category: json['category'] as String? ?? '',
-      location: _getWilayaName(sellerData?['wilaya_id'] as int?),
-      wilaya: _getWilayaName(sellerData?['wilaya_id'] as int?),
-      isLocalPickup: true,
-      sellerVerified: true,
+      location: json['wilaya'] as String? ?? fallbackWilaya,
+      wilaya: json['wilaya'] as String? ?? fallbackWilaya,
+      isLocalPickup: json['is_local_pickup'] as bool? ?? true,
+      sellerVerified: json['seller_verified'] as bool? ?? true,
       seller: sellerData != null
           ? Seller.fromJson(sellerData)
           : const Seller(
